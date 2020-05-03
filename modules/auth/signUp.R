@@ -100,6 +100,16 @@ validateFields <- function(input) {
 }
 
 performanceSignUp <- function(data) {
+  db <-
+    dbConnect(
+      MySQL(),
+      dbname = databaseName,
+      host = options()$mysql$host,
+      port = options()$mysql$port,
+      user = options()$mysql$user,
+      password = options()$mysql$password
+    )
+  res <- "Welcome!"
   query <- sprintf(
     "INSERT INTO %s (%s) VALUES ('%s')",
     "User",
@@ -109,8 +119,9 @@ performanceSignUp <- function(data) {
   tryCatch({
     dbGetQuery(db, query)
   }, error = function(res) {
-    return("Something went worng")
+    res <- "Something went worng"
   })
-  return("Welcome!")
+  dbDisconnect(db)
+  return(res)
   
 }

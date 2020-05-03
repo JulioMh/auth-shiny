@@ -61,6 +61,15 @@ logIn <- function(input, output, session) {
 }
 
 performanceLogIn <- function(userName, password){
+  db <-
+    dbConnect(
+      MySQL(),
+      dbname = databaseName,
+      host = options()$mysql$host,
+      port = options()$mysql$port,
+      user = options()$mysql$user,
+      password = options()$mysql$password
+    )
   query <- sprintf(
     "select * from User where userName= '%s' and password = '%s'",
     userName,
@@ -68,8 +77,10 @@ performanceLogIn <- function(userName, password){
   )
   response <- dbGetQuery(db,query)
   if(nrow(response)==0){
-    return("Wrong user or password")
+    res <- "Wrong user or password"
   }else{
-    return("Welcome!")
+    res <- "Welcome!"
   }
+  dbDisconnect(db)
+  return(res)
 }

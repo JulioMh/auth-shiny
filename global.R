@@ -32,14 +32,4 @@ options(mysql = list(
   "user" = "root",
   "password" = "root"
 ))
-dbDisconnect(db)
 databaseName <- "db"
-db <-
-  dbConnect(
-    MySQL(),
-    dbname = databaseName,
-    host = options()$mysql$host,
-    port = options()$mysql$port,
-    user = options()$mysql$user,
-    password = options()$mysql$password
-  )
