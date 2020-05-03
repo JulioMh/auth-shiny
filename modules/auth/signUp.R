@@ -50,6 +50,9 @@ signUpUI <- function(id) {
 }
 
 signUp <- function(input, output, session) {
+  emailRejex <- "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
+  passRejex <- "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$"
+  
   observeEvent(input$login, {
     change_page("login")
   })
@@ -57,23 +60,14 @@ signUp <- function(input, output, session) {
   output$warning <- renderText({
     validate(
       need(input$userName != "", label = "User name"),
-      need(str_detect(
-        input$email,
-        regex(
-          "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
-        )
-      ), message = "Email isn't correct"),
-      need(str_detect(
-        input$passwd,
-        regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$")
-      ),
-      message = "Password must has at least 6 characters, one number, one uppercase and one lowecase"),
+      need(str_detect(input$email,regex(emailRejex)), message = "Email isn't correct"),
+      need(str_detect(input$passwd,regex(passRejex)), message = "Password must has at least 6 characters, one number, one uppercase and one lowecase"),
       need(input$passwd == input$confPasswd, message = "Passwords must match")
     )
   })
   
   observeEvent(input$signup, isolate({
-    if (validateFields(input)) {
+    if (validateFields(input, emailRejex, passRejex)) {
       data <- list(
         "username" = input$userName,
         "password" = input$passwd,
@@ -85,11 +79,8 @@ signUp <- function(input, output, session) {
   }))
 }
 
-validateFields <- function(input) {
-  emailRejex <- "^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$"
-  passRejex <- "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{6,}$"
+validateFields <- function(input, emailRejex, passRejex) {
   res <- TRUE
-  
   if (input$userName == '' ||
       !str_detect(input$email, regex(emailRejex)) ||
       input$confPasswd != input$passwd ||
